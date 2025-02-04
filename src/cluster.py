@@ -92,9 +92,7 @@ class Cluster:
             raise ValueError("Subnet segment is too large. Please adjust the CIDR range.")
 
         self.secondary_subnet = (
-            ".".join(prefix + [str(next_subnet), "0/19"])
-            if not secondary_cidr
-            else secondary_cidr + "/19"
+            ".".join(prefix + [str(next_subnet), "0/19"]) if not secondary_cidr else secondary_cidr + "/19"
         )
         self.vpc: Union[Vpc, None] = None
         self.subnet: Union[Subnet, None] = None
@@ -342,12 +340,8 @@ class Cluster:
         """
         namespace = k8s.core.v1.Namespace(
             f"{context_prefix()}-argocd-namespace",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="argocd", annotations={"pulumi.com/skipAwait": "true"}
-            ),
-            opts=ResourceOptions(
-                parent=self.cluster, provider=self.k8s_provider, depends_on=self.nodes
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="argocd", annotations={"pulumi.com/skipAwait": "true"}),
+            opts=ResourceOptions(parent=self.cluster, provider=self.k8s_provider, depends_on=self.nodes),
         )
 
         # deploy argocd
@@ -429,9 +423,7 @@ class Cluster:
         helm.Chart(
             f"{context_prefix().lower()}-juno-bootstrap",
             helm.LocalChartOpts(**args),
-            opts=ResourceOptions(
-                parent=secret, provider=self.argo_provider, depends_on=[secret, argo]
-            ),
+            opts=ResourceOptions(parent=secret, provider=self.argo_provider, depends_on=[secret, argo]),
         )
 
     def add_node_group(
@@ -486,9 +478,7 @@ class Cluster:
         if name in ("workstation", "render"):
             args["ami_type"] = "AL2_x86_64_GPU"
             args["disk_size"] = 70
-            args["taints"].append(
-                NodeGroupTaintArgs(effect="NO_SCHEDULE", key=f"junovfx/{name}", value="true")
-            )
+            args["taints"].append(NodeGroupTaintArgs(effect="NO_SCHEDULE", key=f"junovfx/{name}", value="true"))
 
         # noinspection PyTypeChecker
         if resource_name is not None:
