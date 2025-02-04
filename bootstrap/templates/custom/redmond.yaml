@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redmond-bootstapping
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/RedmondAI/eks-bootstrap.git 
+    targetRevision: HEAD
+    path: bootstrap  # Directory containing your k8s manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default  # Or your preferred namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
