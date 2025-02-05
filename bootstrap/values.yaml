@@ -5,16 +5,16 @@ domain: "redmond3d.com"
 
 # ArgoCD Dex config
 # https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#dex
-# argoConfig: |
-#   connectors:
-#   - config:
-#       issuer: https://xxxxxxxxxxx
-#       clientID: xxxxxxx
-#       clientSecret: xxxxxxx
-#     type: oidc
-#     id: xxxx
-#     name: xxxx
-argoConfig: ""
+argoConfig: |
+  connectors:
+  - config:
+      issuer: https://xxxxxxxxxxx
+      clientID: xxxxxxx
+      clientSecret: xxxxxxx
+    type: oidc
+    id: xxxx
+    name: xxxx
+# argoConfig: ""
 
 # nginx certs
 # nginx default cert for ingress <namespace>/<secret>
