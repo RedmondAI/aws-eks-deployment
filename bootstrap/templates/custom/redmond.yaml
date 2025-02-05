@@ -34,7 +34,7 @@ spec:
   # We use the multi source approach to allow for the use of a private values repo
   # https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/
   sources:
-    - path: deploy
+    - path: .
       repoURL: "https://github.com/RedmondAI/eks-bootstap.git" 
       targetRevision: main
       helm:
