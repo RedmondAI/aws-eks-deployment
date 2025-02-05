@@ -14,7 +14,7 @@ set_session("cosmos")  # this is a trackable session name
 
 # bootstrap
 Cluster.set_bootstrap_repository(
-    repository="https://github.com/RedmondAI/aws-eks-infrastructure.git",
+    repository="https://github.com/RedmondAI/aws-eks-deployment.git",
     path="bootstrap/",
 )
 

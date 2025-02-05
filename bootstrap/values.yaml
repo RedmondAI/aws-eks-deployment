@@ -1,7 +1,7 @@
 # BOOTSTRAP CONFIGURATION
 
 # specify the domain that the ingress will listen on i.e. "junovfx.com"
-domain:
+domain: "redmond3d.com"
 
 # ArgoCD Dex config
 # https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#dex
@@ -14,12 +14,12 @@ domain:
 #     type: oidc
 #     id: xxxx
 #     name: xxxx
-argoConfig:
+argoConfig: ""
 
 # nginx certs
 # nginx default cert for ingress <namespace>/<secret>
 # example: ingress-nginx/juno-cert
-ingressCertSecret:
+ingressCertSecret: "ingress-nginx/redmond-cert"
 
 # GPU operator
 # https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html#configuration
