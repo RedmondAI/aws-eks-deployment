@@ -1,20 +1,56 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: redmond-bootstapping
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/RedmondAI/eks-bootstrap.git 
+#     targetRevision: HEAD
+#     path: bootstrap  # Directory containing your k8s manifests
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: default  # Or your preferred namespace
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#     - CreateNamespace=true
+
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: redmond-bootstapping
+  name: regional-controller
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://github.com/RedmondAI/eks-bootstrap.git 
-    targetRevision: HEAD
-    path: bootstrap  # Directory containing your k8s manifests
   destination:
     server: https://kubernetes.default.svc
-    namespace: default  # Or your preferred namespace
+    namespace: argocd
+
+  # We use the multi source approach to allow for the use of a private values repo
+  # https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/
+  sources:
+    - path: deploy
+      repoURL: "https://github.com/RedmondAI/eks-bootstap.git" 
+      targetRevision: main
+      helm:
+        parameters:
+          - name: account
+            value: {{ .Values.account }}
+          - name: file_system
+            value: {{ .Values.file_system }}
+          - name: region
+            value: {{ .Values.region }}
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+      allowEmpty: true
+
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
