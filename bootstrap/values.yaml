@@ -1,7 +1,7 @@
 # BOOTSTRAP CONFIGURATION
 
 # specify the domain that the ingress will listen on i.e. "junovfx.com"
-domain: "redmond3d.com"
+domain: "fngs.io"
 
 # ArgoCD Dex config
 # https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#dex
