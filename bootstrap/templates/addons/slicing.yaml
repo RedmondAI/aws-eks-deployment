@@ -5,4 +5,14 @@ metadata:
   name: time-slicing-config
   namespace: gpu-operator
 data:
-  any: "{{ .Values.gpuSlicingConfig | toYaml | nindent 4 }}"
+  any:
+    version: v1
+    flags:
+      migStrategy: none
+    sharing:
+      timeSlicing:
+        renameByDefault: false
+        failRequestsGreaterThanOne: false
+        resources:
+          - name: nvidia.com/gpu
+            replicas: 4
