@@ -477,7 +477,7 @@ class Cluster:
 
         if name in ("workstation", "render"):
             args["ami_type"] = "AL2_x86_64_GPU"
-            args["disk_size"] = 70
+            args["disk_size"] = 120
             args["taints"].append(NodeGroupTaintArgs(effect="NO_SCHEDULE", key=f"junovfx/{name}", value="true"))
 
         # noinspection PyTypeChecker

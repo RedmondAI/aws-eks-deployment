@@ -49,3 +49,33 @@ with JunoAccount("sandbox"):
                 size=1,
                 maximum=5,
             )
+            cluster.add_node_group(
+                name="workstation",
+                instances=["g4dn.2xlarge"],
+                capacity_type=cluster.CapacityType.ON_DEMAND,
+                minimum=0,
+                size=0,
+                maximum=3,
+                resource_name="gpu-workstation",
+                labels={"nvidia/gpu": "true"},
+            )
+            cluster.add_node_group(
+                name="r3dc",
+                instances=["t3.xlarge"],
+                capacity_type=cluster.CapacityType.SPOT,
+                minimum=0,
+                size=0,
+                maximum=5,
+                resource_name="r3d-cpu",
+                labels={"r3d/mode": "cpu"}
+            )
+            cluster.add_node_group(
+                name="r3dg",
+                instances=["g6e.2xlarge"],
+                capacity_type=cluster.CapacityType.SPOT,
+                minimum=0,
+                size=0,
+                maximum=5,
+                resource_name="r3d-gpu",
+                labels={"r3d/mode": "gpu"}
+            )
