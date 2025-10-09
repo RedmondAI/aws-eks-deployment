@@ -43,6 +43,7 @@ from .node_role import build_node_role
 from .provider import juno_resource, get_context, context_prefix, set_cluster
 from .security import SecuritySpec
 from .context.session import get_profile
+from .account import eks_node_role
 
 
 azs = get_availability_zones(state="available").names
@@ -150,6 +151,15 @@ class Cluster:
             availability_zone_name=self.production_zone,
             **juno_resource("efs"),
         )
+
+
+    def update_cluster_roles(self):
+        """
+        Update cluster roles
+        """
+
+        eks_node_role()
+
 
     def build_mount(self):
         """
@@ -320,6 +330,20 @@ class Cluster:
                 ),
             )
 
+        # # Create an S3 Gateway Endpoint to save on S3 access within the NAT
+        s3_gateway_endpoint = aws.ec2.VpcEndpoint(            vpc_id=self.vpc.id,
+            service_name=f"com.amazonaws.{self.context.region}.s3",
+            vpc_endpoint_type="Gateway",
+            route_table_ids=[production_route_table.id],
+            **juno_resource(
+                    "s3-gateway-endpoint",
+                    opts=dict(depends_on=[self.vpc], parent=self.vpc)
+                )
+        )
+
+
+
+
     def build_node_role(self):
         """
         Build the node role
@@ -488,6 +512,14 @@ class Cluster:
             opts=ResourceOptions(parent=self.cluster, provider=self.context.provider),
         )
 
+        aws.eks.Addon(f"{context_prefix()}-aws-mountpoint-s3-csi-driver",
+            cluster_name=self.cluster_name,
+            addon_name="aws-mountpoint-s3-csi-driver",
+            resolve_conflicts_on_create="OVERWRITE",
+            opts=ResourceOptions(parent=self.cluster, provider=self.context.provider)
+        )
+
+
         chart_path = f"{os.path.dirname(__file__)}/chart"
         tag = context_prefix()
 
@@ -541,6 +573,7 @@ class Cluster:
         labels: Dict[str, str] = None,
         taints: List[str] = None,
         gpu: bool = False,
+        disk_size: int = 200
     ):
         """
         Create a node group for the project cluster
@@ -563,7 +596,7 @@ class Cluster:
             node_role_arn=self.base_node_role.arn,
             capacity_type=capacity_type.value,
             instance_types=instances,
-            disk_size=150,
+            disk_size=disk_size,
             subnet_ids=[self.production_subnet.id],
             labels=labels,
             taints=[
@@ -587,7 +620,7 @@ class Cluster:
 
         if gpu:
             args["ami_type"] = "AL2_x86_64_GPU"
-            args["disk_size"] = 70
+            # args["disk_size"] = 70
 
         self.nodes.append(
             ManagedNodeGroup(

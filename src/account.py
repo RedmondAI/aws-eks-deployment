@@ -20,7 +20,7 @@ def load_custom_policies() -> List[Policy]:
     from .provider import juno_account_resource  # noqa: PLC0415
 
     policies = []
-    custom_policies = os.path.abspath(f"{__file__}/../../custom_policies")
+    custom_policies = os.path.abspath(f"{__file__}/../custom_policies")
 
     for custom_policy in os.listdir(custom_policies):
         # load policy from json file
@@ -31,7 +31,37 @@ def load_custom_policies() -> List[Policy]:
 
         name = f'{custom_policy.split(".")[0]}-policy'
         policies.append(Policy(policy=policy, **juno_account_resource(name)))
+
+
+    # # load s3 policy for change
+    # custom_policy = "eks-s3.json"
+    # with open(
+    #     os.path.join(custom_policies, custom_policy), "r", encoding="utf-8"
+    # ) as policy_file:
+    #     policy = loads(policy_file.read())
+
+    # name = f'{custom_policy.split(".")[0]}-policy'
+    # policies.append(Policy(policy=policy, **juno_account_resource(name)))
+
     return policies
+
+
+def load_s3_policy() -> List[Policy]:
+    """
+    Load custom policies into the account
+    """
+    # need to do this here because of the circular import
+    from .provider import juno_account_resource  # noqa: PLC0415
+
+    # load s3 policy for change
+    custom_policy = "eks-s3.json"
+    with open(
+        os.path.join(custom_policies, custom_policy), "r", encoding="utf-8"
+    ) as policy_file:
+        policy = loads(policy_file.read())
+
+    name = f'{custom_policy.split(".")[0]}-policy'
+    return Policy(policy=policy, **juno_account_resource(name))
 
 
 def load_custom_roles() -> List[Role]:

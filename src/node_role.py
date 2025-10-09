@@ -43,6 +43,12 @@ def build_node_role(cluster: str, parent: Subnet) -> Role:
         opts=ResourceOptions(parent=base_node_role),
     )
 
+    s3_policy = Policy(
+        f"{context_prefix()}-base-node-s3-policy",
+        PolicyArgs(policy=policies.get_policy("eks-s3")),
+        opts=ResourceOptions(parent=base_node_role),
+    )
+
     ecr_policy = Policy(
         f"{context_prefix()}-base-node-ecr-policy",
         PolicyArgs(policy=policies.get_policy("ecr")),
@@ -66,6 +72,7 @@ def build_node_role(cluster: str, parent: Subnet) -> Role:
         efs_policy.arn,
         ecr_policy.arn,
         alb_policy.arn,
+        s3_policy.arn,
     ]
 
     for idx, policy in enumerate(node_policies):

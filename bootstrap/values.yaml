@@ -20,8 +20,28 @@ ingressCertSecret:
 
 # GPU operator
 # https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html#configuration
-# To configure the GPU Operator slicing, customize the slicing.yaml file that lives in
-# templates/addons/slicing.yaml.
+# gpuSlicing: |-
+#   version: v1
+#   flags:
+#     migStrategy: none
+#   sharing:
+#     timeSlicing:
+#       renameByDefault: false
+#       failRequestsGreaterThanOne: false
+#       resources:
+#         - name: nvidia.com/gpu
+#           replicas: 4
+gpuSlicingConfig: |-
+  version: v1
+  flags:
+    migStrategy: none
+  sharing:
+    timeSlicing:
+      renameByDefault: false
+      failRequestsGreaterThanOne: false
+      resources:
+        - name: nvidia.com/gpu
+          replicas: 1
 
 # Autoscaler Configuration
 scaleDownTime: 1m
