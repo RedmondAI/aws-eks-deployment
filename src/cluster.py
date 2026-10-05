@@ -11,6 +11,7 @@ from enum import Enum
 
 # 3rd
 from pulumiverse_time import Sleep
+import pulumi
 from pulumi import ResourceOptions
 from pulumi_aws.ec2 import (
     RouteTable,
@@ -51,6 +52,21 @@ azs = get_availability_zones(state="available").names
 
 if not os.environ.get("GIT_USER") or not os.environ.get("GIT_PASS"):
     raise ValueError("GIT_USER and GIT_PASS must be set in the environment for GitHub")
+
+
+def _ignore_autoscaled_desired_size(args: pulumi.ResourceTransformationArgs):
+    """
+    cluster-autoscaler owns a node group's desired size after creation, so never
+    let `pulumi up` reset a live node group back to its initial `size`. Applied as
+    a transformation because pulumi_eks.ManagedNodeGroup is a component and
+    ignore_changes on the component does not reach the inner aws NodeGroup.
+    """
+    if args.type_ == "aws:eks/nodeGroup:NodeGroup":
+        args.opts.ignore_changes = list(args.opts.ignore_changes or []) + [
+            "scalingConfig.desiredSize"
+        ]
+        return pulumi.ResourceTransformationResult(args.props, args.opts)
+    return None
 
 
 class Cluster:
@@ -626,6 +642,10 @@ class Cluster:
             ManagedNodeGroup(
                 f"{context_prefix()}-{name}-nodes",
                 ManagedNodeGroupArgs(**args),
-                opts=ResourceOptions(depends_on=self.cluster, parent=self.cluster),
+                opts=ResourceOptions(
+                    depends_on=self.cluster,
+                    parent=self.cluster,
+                    transformations=[_ignore_autoscaled_desired_size],
+                ),
             )
         )

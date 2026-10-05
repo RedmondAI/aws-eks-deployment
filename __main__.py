@@ -51,8 +51,8 @@ with JunoAccount("sandbox"):                    # this is the account that will 
                 instances=["c6a.xlarge", "t3.xlarge"],
                 capacity_type=cluster.CapacityType.ON_DEMAND,
                 minimum=1,
-                size=1,
-                maximum=5,
+                size=5,     # initial only; cluster-autoscaler owns desired size afterwards
+                maximum=10, # raised from 5 after 2026-10-05 service-node memory exhaustion
                 labels={
                     "juno-innovations.com/service": "true"
                 }
